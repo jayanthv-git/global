@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+.runtime/
+*.db
+*.db-*
+.env
+node_modules/
+frontend/dist/
+.DS_Store
+coverage.xml

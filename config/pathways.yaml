@@ -1,0 +1,18 @@
+version: demo-1.0
+status: UNVERIFIED_CLINICAL_POLICY
+change_thresholds: {PHQ-9: 5, GAD-7: 4, WHO-5: 10}
+change_threshold_status: UNVERIFIED
+minimum_aggregate_size: 10
+review_target_minutes: 15
+review_target_status: UNVERIFIED_DEMO_TARGET
+steps:
+  minimal: [self_help, community]
+  mild: [community, primary_care]
+  moderate: [primary_care, tele_mental_health]
+  moderately_severe: [specialist, primary_care]
+  severe: [specialist, primary_care]
+  low_wellbeing: [primary_care, tele_mental_health]
+  higher_wellbeing: [self_help, community]
+crisis_keywords:
+  en: [suicide, kill myself, end my life, hurt myself, self-harm]
+  ar: [انتحار, الانتحار, أقتل نفسي, اقتل نفسي, إيذاء نفسي, ايذاء نفسي]

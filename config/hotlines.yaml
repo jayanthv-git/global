@@ -1,0 +1,19 @@
+# User-supplied fixtures. Not verified emergency resources. No call links in demo.
+country: AE
+status: NEEDS_VERIFICATION
+hotlines:
+  - name: 800-SAKINA
+    number: '800 725462'
+    source_url: https://www.doh.gov.ae/
+    source_status: authority_lookup_only_not_evidence
+    verified_at: null
+  - name: Istijaba
+    number: '800 1717'
+    source_url: https://www.doh.gov.ae/
+    source_status: authority_lookup_only_not_evidence
+    verified_at: null
+  - name: 800-HOPE
+    number: '800 4673'
+    source_url: https://www.emiratesfoundation.ae/
+    source_status: authority_lookup_only_not_evidence
+    verified_at: null

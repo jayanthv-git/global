@@ -1,0 +1,7 @@
+status: PLACEHOLDER_NOT_VALIDATED
+wording: No clinical item wording supplied. Every item is a numbered demonstration placeholder.
+version: placeholder-1
+instruments:
+  PHQ-9: {items: 9, max_response: 3, score_max: 27, direction: lower}
+  GAD-7: {items: 7, max_response: 3, score_max: 21, direction: lower}
+  WHO-5: {items: 5, max_response: 5, score_max: 100, direction: higher}
