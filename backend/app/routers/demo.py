@@ -19,6 +19,6 @@ def session(body:DemoSession,db=Depends(get_db)):
     token=secrets.token_urlsafe(32)
     id='session-'+secrets.token_hex(10)
     db.add(Identity(id=id,user_id=user_id,role='participant' if user_id else body.persona,
-        grantee=body.provider_id if body.persona=='provider' else None,token_hash=token_hash(token)))
+        grantee=body.provider_id if body.persona=='provider' else 'demo-clinician' if body.persona=='clinician' else None,token_hash=token_hash(token)))
     db.commit()
     return {'token':token,'user_id':user_id,'role':body.persona,'synthetic':True}
