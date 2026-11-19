@@ -1,18 +1,358 @@
-import React,{useState,useEffect} from 'react';
-import {useTranslation} from 'react-i18next';
-import {ClipboardList,Activity,ShieldCheck,FlaskConical,Scissors} from 'lucide-react';
-import {operations} from './api';
-import {Badge,Button,Header,Select,Empty} from './components';
-import {date} from './Care';
-export function Queue(){const{t,i18n}=useTranslation();const[data,setData]=useState(null);const[adverseLog,setAdverseLog]=useState([]);const[error,setError]=useState('');const[tick,setTick]=useState(0);useEffect(()=>{let live=true;Promise.all([operations('/clinician/queue'),operations('/clinician/adverse-events')]).then(([d,events])=>{if(live){setData(d);setAdverseLog(events.items)}}).catch(e=>{if(live)setError(e.message)});return()=>{live=false}},[tick]);useEffect(()=>{const timer=setInterval(()=>setTick(n=>n+1),30000);return()=>clearInterval(timer)},[]);
- return <><Header eyebrow={t('simulated')} title={t('clinician_title')} subtitle={t('clinician_intro')}/><div className="notice"><strong>{t('no_staff')}</strong><br/>{t('review_target')}: {data?.target_minutes??'—'} {t('minutes')} · {t('unverified')}</div>{error&&<p className="error">{t(error)}</p>}<div className="queue-grid">{data?.tasks.map(task=><Task key={task.id} task={task} reload={()=>setTick(n=>n+1)}/>)}</div>{data?.tasks.length===0&&<Empty/>}<section style={{marginTop:30}}><h2>{t('adverse_log')}</h2><Badge kind="warning">{t('simulated')}</Badge>{adverseLog.length===0?<Empty/>:<div className="stack" style={{marginTop:18}}>{adverseLog.map(e=><div className="record" key={e.id}><strong>{t(e.category)}</strong><p>{date(e.created_at,i18n.language)}</p><span className="tiny" dir="ltr">{e.id.slice(0,8)}</span></div>)}</div>}</section></>
+import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import {
+  ClipboardList,
+  Activity,
+  ShieldCheck,
+  FlaskConical,
+  Scissors,
+} from 'lucide-react';
+import { operations } from './api';
+import { Badge, Button, Header, Select, Empty } from './components';
+import { date } from './Care';
+export function Queue() {
+  const { t, i18n } = useTranslation();
+  const [data, setData] = useState(null);
+  const [adverseLog, setAdverseLog] = useState([]);
+  const [error, setError] = useState('');
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    let live = true;
+    Promise.all([operations('/clinician/queue'), operations('/clinician/adverse-events')])
+      .then(([d, events]) => {
+        if (live) {
+          setData(d);
+          setAdverseLog(events.items);
+        }
+      })
+      .catch((e) => {
+        if (live) setError(e.message);
+      });
+    return () => {
+      live = false;
+    };
+  }, [tick]);
+  useEffect(() => {
+    const timer = setInterval(() => setTick((n) => n + 1), 30000);
+    return () => clearInterval(timer);
+  }, []);
+  return (
+    <>
+      <Header
+        eyebrow={t('simulated')}
+        title={t('clinician_title')}
+        subtitle={t('clinician_intro')}
+      />
+      <div className="notice">
+        <strong>{t('no_staff')}</strong>
+        <br />
+        {t('review_target')}: {data?.target_minutes ?? '—'} {t('minutes')} ·{' '}
+        {t('unverified')}
+      </div>
+      {error && <p className="error">{t(error)}</p>}
+      <div className="queue-grid">
+        {data?.tasks.map((task) => (
+          <Task key={task.id} task={task} reload={() => setTick((n) => n + 1)} />
+        ))}
+      </div>
+      {data?.tasks.length === 0 && <Empty />}
+      <section style={{ marginTop: 30 }}>
+        <h2>{t('adverse_log')}</h2>
+        <Badge kind="warning">{t('simulated')}</Badge>
+        {adverseLog.length === 0 ? (
+          <Empty />
+        ) : (
+          <div className="stack" style={{ marginTop: 18 }}>
+            {adverseLog.map((e) => (
+              <div className="record" key={e.id}>
+                <strong>{t(e.category)}</strong>
+                <p>{date(e.created_at, i18n.language)}</p>
+                <span className="tiny" dir="ltr">
+                  {e.id.slice(0, 8)}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+    </>
+  );
 }
-function Task({task,reload}){const{t,i18n}=useTranslation();const[note,setNote]=useState('');const[category,setCategory]=useState('technical_failure');const[error,setError]=useState('');const[busy,setBusy]=useState(false);const[message,setMessage]=useState('');
- async function action(verb){setBusy(true);setError('');try{await operations('/clinician/escalations/'+task.id+'/'+verb,{method:'POST',...(verb==='resolve'?{body:JSON.stringify({note})}:{})});reload()}catch(e){setError(e.message)}finally{setBusy(false)}}
- async function adverse(){setBusy(true);try{await operations('/clinician/adverse-events',{method:'POST',body:JSON.stringify({escalation_id:task.id,category,note})});setMessage('adverse_saved');reload()}catch(e){setError(e.message)}finally{setBusy(false)}}
- return <section className="card"><div className="section-head"><ClipboardList size={22}/><Badge>{t(task.status)}</Badge></div><p className="tiny" dir="ltr">{task.id.slice(0,8)}</p><p className="queue-time">{Math.floor(task.elapsed_minutes)} <small>{t('minutes')}</small></p><p className="small muted">{t('elapsed')} · {date(task.created_at,i18n.language)}</p>{task.contacted_at&&<p className="success">{t('contacted')}</p>}{task.status==='open'&&<Button disabled={busy} onClick={()=>action('claim')}>{t('claim')}</Button>}{task.status==='claimed'&&task.mine&&<>{!task.contacted_at&&<Button disabled={busy} onClick={()=>action('contact')}>{t('contact')}</Button>}<label className="field" style={{marginTop:22}}><span>{t('resolution')}</span><textarea maxLength={2000} value={note} onChange={e=>setNote(e.target.value)}/></label><Button disabled={busy||note.trim().length<3||!task.contacted_at} onClick={()=>action('resolve')}>{t('resolve')}</Button></>}{task.mine&&<details style={{marginTop:22}}><summary>{t('adverse')}</summary><div style={{marginTop:18}}><Select label={t('category')} value={category} onChange={setCategory} options={['missed_followup','incorrect_route','technical_failure'].map(x=>[x,t(x)])}/><label className="field"><span>{t('note')}</span><textarea value={note} onChange={e=>setNote(e.target.value)} maxLength={2000}/></label><Button secondary disabled={busy||note.trim().length<3} onClick={adverse}>{t('save')}</Button></div></details>}{error&&<p className="error" role="alert">{t(error)}</p>}{message&&<p className="success">{t(message)}</p>}</section>
+function Task({ task, reload }) {
+  const { t, i18n } = useTranslation();
+  const [note, setNote] = useState('');
+  const [category, setCategory] = useState('technical_failure');
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState('');
+  async function action(verb) {
+    setBusy(true);
+    setError('');
+    try {
+      await operations('/clinician/escalations/' + task.id + '/' + verb, {
+        method: 'POST',
+        ...(verb === 'resolve' ? { body: JSON.stringify({ note }) } : {}),
+      });
+      reload();
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function adverse() {
+    setBusy(true);
+    try {
+      await operations('/clinician/adverse-events', {
+        method: 'POST',
+        body: JSON.stringify({ escalation_id: task.id, category, note }),
+      });
+      setMessage('adverse_saved');
+      reload();
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <section className="card">
+      <div className="section-head">
+        <ClipboardList size={22} />
+        <Badge>{t(task.status)}</Badge>
+      </div>
+      <p className="tiny" dir="ltr">
+        {task.id.slice(0, 8)}
+      </p>
+      <p className="queue-time">
+        {Math.floor(task.elapsed_minutes)} <small>{t('minutes')}</small>
+      </p>
+      <p className="small muted">
+        {t('elapsed')} · {date(task.created_at, i18n.language)}
+      </p>
+      {task.contacted_at && <p className="success">{t('contacted')}</p>}
+      {task.status === 'open' && (
+        <Button disabled={busy} onClick={() => action('claim')}>
+          {t('claim')}
+        </Button>
+      )}
+      {task.status === 'claimed' && task.mine && (
+        <>
+          {!task.contacted_at && (
+            <Button disabled={busy} onClick={() => action('contact')}>
+              {t('contact')}
+            </Button>
+          )}
+          <label className="field" style={{ marginTop: 22 }}>
+            <span>{t('resolution')}</span>
+            <textarea
+              maxLength={2000}
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+            />
+          </label>
+          <Button
+            disabled={busy || note.trim().length < 3 || !task.contacted_at}
+            onClick={() => action('resolve')}
+          >
+            {t('resolve')}
+          </Button>
+        </>
+      )}
+      {task.mine && (
+        <details style={{ marginTop: 22 }}>
+          <summary>{t('adverse')}</summary>
+          <div style={{ marginTop: 18 }}>
+            <Select
+              label={t('category')}
+              value={category}
+              onChange={setCategory}
+              options={['missed_followup', 'incorrect_route', 'technical_failure'].map(
+                (x) => [x, t(x)],
+              )}
+            />
+            <label className="field">
+              <span>{t('note')}</span>
+              <textarea
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                maxLength={2000}
+              />
+            </label>
+            <Button secondary disabled={busy || note.trim().length < 3} onClick={adverse}>
+              {t('save')}
+            </Button>
+          </div>
+        </details>
+      )}
+      {error && (
+        <p className="error" role="alert">
+          {t(error)}
+        </p>
+      )}
+      {message && <p className="success">{t(message)}</p>}
+    </section>
+  );
 }
-export function Metrics(){const{t}=useTranslation();const[dimension,setDimension]=useState('all');const[data,setData]=useState(null);const[error,setError]=useState('');useEffect(()=>{let live=true;setData(null);operations('/metrics/aggregate?dimension='+dimension).then(r=>{if(live){setData(r);setError('')}}).catch(e=>{if(live)setError(e.message)});return()=>{live=false}},[dimension]);const fmt=(n,suffix='')=>n===null||n===undefined?t('suppressed'):n+suffix;const total=dimension==='all'?data?.groups[0]:null;
- return <><Header eyebrow={t('synthetic')} title={t('metrics_title')} subtitle={t('metrics_intro')}/><div className="section-head"><Select label={t('stratify')} value={dimension} onChange={setDimension} options={['all','age_band','gender','nationality','language','geography'].map(v=>[v,t(v)])}/><Badge kind="warning">{t('synthetic')}</Badge></div>{data&&<><p className="small muted">{t('minimum',{n:data.minimum})}</p><p className="small muted">{t('cohort_note')}</p></>}{error&&<p className="error">{t(error)}</p>}{total&&<div className="metrics-cards">{[['participants',total.participants,''],['handoff_completion',total.handoff.attended,'%'],['followup_time',total.followup_hours,''],['symptom_change',total.symptom_change['PHQ-9'],''],['crisis_completion',total.crisis_completion,'%'],['contact_time',total.human_contact_minutes,'']].map(([key,value,suffix])=><div className="metric" key={key}><span>{t(key)}</span><strong>{fmt(value,suffix)}</strong><small>{t('synthetic')}</small></div>)}</div>}{data?.groups.length===0?<Empty text={t('metrics_empty')}/>:<div className="table-wrap"><table><caption className="small" style={{padding:13,textAlign:'start'}}>{t('synthetic')}</caption><thead><tr>{['group','participants','accepted','booked','handoff_completion','followup_time','metric_change','crisis_completion','contact_time','adverse_events'].map(k=><th key={k}>{t(k)}</th>)}</tr></thead><tbody>{data?.groups.map(g=><tr key={g.group}><td><strong>{t(g.group)}</strong></td><td>{g.participants}</td><td>{fmt(g.handoff.accepted,'%')}</td><td>{fmt(g.handoff.booked,'%')}</td><td>{fmt(g.handoff.attended,'%')}{g.handoff.attended!==null&&<div className="metric-bar"><i style={{width:g.handoff.attended+'%'}}/></div>}</td><td>{fmt(g.followup_hours)}</td><td>{Object.entries(g.symptom_change).map(([instrument,value])=><div key={instrument}>{instrument}: {fmt(value)}</div>)}</td><td>{fmt(g.crisis_completion,'%')}</td><td>{fmt(g.human_contact_minutes)}</td><td>{fmt(g.adverse_event_participants)}</td></tr>)}</tbody></table></div>}</>
+export function Metrics() {
+  const { t } = useTranslation();
+  const [dimension, setDimension] = useState('all');
+  const [data, setData] = useState(null);
+  const [error, setError] = useState('');
+  useEffect(() => {
+    let live = true;
+    setData(null);
+    operations('/metrics/aggregate?dimension=' + dimension)
+      .then((r) => {
+        if (live) {
+          setData(r);
+          setError('');
+        }
+      })
+      .catch((e) => {
+        if (live) setError(e.message);
+      });
+    return () => {
+      live = false;
+    };
+  }, [dimension]);
+  const fmt = (n, suffix = '') =>
+    n === null || n === undefined ? t('suppressed') : n + suffix;
+  const total = dimension === 'all' ? data?.groups[0] : null;
+  return (
+    <>
+      <Header
+        eyebrow={t('synthetic')}
+        title={t('metrics_title')}
+        subtitle={t('metrics_intro')}
+      />
+      <div className="section-head">
+        <Select
+          label={t('stratify')}
+          value={dimension}
+          onChange={setDimension}
+          options={[
+            'all',
+            'age_band',
+            'gender',
+            'nationality',
+            'language',
+            'geography',
+          ].map((v) => [v, t(v)])}
+        />
+        <Badge kind="warning">{t('synthetic')}</Badge>
+      </div>
+      {data && (
+        <>
+          <p className="small muted">{t('minimum', { n: data.minimum })}</p>
+          <p className="small muted">{t('cohort_note')}</p>
+        </>
+      )}
+      {error && <p className="error">{t(error)}</p>}
+      {total && (
+        <div className="metrics-cards">
+          {[
+            ['participants', total.participants, ''],
+            ['handoff_completion', total.handoff.attended, '%'],
+            ['followup_time', total.followup_hours, ''],
+            ['symptom_change', total.symptom_change['PHQ-9'], ''],
+            ['crisis_completion', total.crisis_completion, '%'],
+            ['contact_time', total.human_contact_minutes, ''],
+          ].map(([key, value, suffix]) => (
+            <div className="metric" key={key}>
+              <span>{t(key)}</span>
+              <strong>{fmt(value, suffix)}</strong>
+              <small>{t('synthetic')}</small>
+            </div>
+          ))}
+        </div>
+      )}
+      {data?.groups.length === 0 ? (
+        <Empty text={t('metrics_empty')} />
+      ) : (
+        <div className="table-wrap">
+          <table>
+            <caption className="small" style={{ padding: 13, textAlign: 'start' }}>
+              {t('synthetic')}
+            </caption>
+            <thead>
+              <tr>
+                {[
+                  'group',
+                  'participants',
+                  'accepted',
+                  'booked',
+                  'handoff_completion',
+                  'followup_time',
+                  'metric_change',
+                  'crisis_completion',
+                  'contact_time',
+                  'adverse_events',
+                ].map((k) => (
+                  <th key={k}>{t(k)}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {data?.groups.map((g) => (
+                <tr key={g.group}>
+                  <td>
+                    <strong>{t(g.group)}</strong>
+                  </td>
+                  <td>{g.participants}</td>
+                  <td>{fmt(g.handoff.accepted, '%')}</td>
+                  <td>{fmt(g.handoff.booked, '%')}</td>
+                  <td>
+                    {fmt(g.handoff.attended, '%')}
+                    {g.handoff.attended !== null && (
+                      <div className="metric-bar">
+                        <i style={{ width: g.handoff.attended + '%' }} />
+                      </div>
+                    )}
+                  </td>
+                  <td>{fmt(g.followup_hours)}</td>
+                  <td>
+                    {Object.entries(g.symptom_change).map(([instrument, value]) => (
+                      <div key={instrument}>
+                        {instrument}: {fmt(value)}
+                      </div>
+                    ))}
+                  </td>
+                  <td>{fmt(g.crisis_completion, '%')}</td>
+                  <td>{fmt(g.human_contact_minutes)}</td>
+                  <td>{fmt(g.adverse_event_participants)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </>
+  );
 }
-export function About(){const{t}=useTranslation();return <><Header eyebrow={t('about')} title={t('about_title')} subtitle={t('demo_warning')}/><div className="about-grid">{[['real',ShieldCheck],['sim',FlaskConical],['cut',Scissors]].map(([kind,Icon])=><section className="card" key={kind}><Icon size={25}/><h2 style={{marginTop:20}}>{t(kind+'_title')}</h2><p>{t(kind+'_body')}</p></section>)}</div><p className="notice">{t('offline_note')}</p></>}
+export function About() {
+  const { t } = useTranslation();
+  return (
+    <>
+      <Header
+        eyebrow={t('about')}
+        title={t('about_title')}
+        subtitle={t('demo_warning')}
+      />
+      <div className="about-grid">
+        {[
+          ['real', ShieldCheck],
+          ['sim', FlaskConical],
+          ['cut', Scissors],
+        ].map(([kind, Icon]) => (
+          <section className="card" key={kind}>
+            <Icon size={25} />
+            <h2 style={{ marginTop: 20 }}>{t(kind + '_title')}</h2>
+            <p>{t(kind + '_body')}</p>
+          </section>
+        ))}
+      </div>
+      <p className="notice">{t('offline_note')}</p>
+    </>
+  );
+}

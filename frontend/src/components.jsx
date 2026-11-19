@@ -1,9 +1,102 @@
-import React,{useId,useRef,useEffect} from 'react';
-import {useTranslation} from 'react-i18next';
-import {ArrowUpRight, ShieldCheck, X, AlertCircle} from 'lucide-react';
-export function Badge({children,kind=''}){return <span className={'badge '+kind}>{children}</span>}
-export function Header({eyebrow,title,subtitle,children}){return <header className="page-heading"><div className="eyebrow">{eyebrow}</div><h1>{title}</h1>{subtitle&&<p>{subtitle}</p>}{children}</header>}
-export function Empty({text}){const{t}=useTranslation();return <div className="empty"><ShieldCheck size={26}/><p>{text||t('empty')}</p></div>}
-export function Select({label,value,onChange,options}){const id=useId();return <label className="field"><span id={id}>{label}</span><select aria-labelledby={id} value={value} onChange={e=>onChange(e.target.value)}>{options.map(o=><option key={o[0]} value={o[0]}>{o[1]}</option>)}</select></label>}
-export function CrisisPanel({state,onClose}){const{t}=useTranslation();const panel=useRef(null);useEffect(()=>{panel.current?.focus()},[]);return <section ref={panel} tabIndex={-1} className="crisis-panel" role="alert" aria-live="assertive"><div className="crisis-head"><AlertCircle/><h2>{t('urgent_title')}</h2><button className="icon-button" onClick={onClose} aria-label={t('close')}><X/></button></div><p>{t('urgent_guidance')}</p><p className="status-line">{t(state.error?'task_failed':state.saved?'task_created':'loading')}</p><Badge kind="warning">{t('simulated')}</Badge><p className="small">{t('hotline_note')}</p><div className="hotlines">{(state.hotlines||[]).map(h=><div key={h.name}><strong>{h.name}</strong><b dir="ltr">{h.number}</b><span>{t('needs_verification')}</span></div>)}</div></section>}
-export function Button({children,onClick,secondary=false,disabled=false,type='button'}){return <button type={type} disabled={disabled} className={secondary?'button secondary':'button'} onClick={onClick}>{children}{!secondary&&<ArrowUpRight size={17}/>}</button>}
+import React, { useId, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { ArrowUpRight, ShieldCheck, X, AlertCircle } from 'lucide-react';
+export function Badge({ children, kind = '' }) {
+  return <span className={'badge ' + kind}>{children}</span>;
+}
+export function Header({ eyebrow, title, subtitle, children }) {
+  return (
+    <header className="page-heading">
+      <div className="eyebrow">{eyebrow}</div>
+      <h1>{title}</h1>
+      {subtitle && <p>{subtitle}</p>}
+      {children}
+    </header>
+  );
+}
+export function Empty({ text }) {
+  const { t } = useTranslation();
+  return (
+    <div className="empty">
+      <ShieldCheck size={26} />
+      <p>{text || t('empty')}</p>
+    </div>
+  );
+}
+export function Select({ label, value, onChange, options }) {
+  const id = useId();
+  return (
+    <label className="field">
+      <span id={id}>{label}</span>
+      <select
+        aria-labelledby={id}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      >
+        {options.map((o) => (
+          <option key={o[0]} value={o[0]}>
+            {o[1]}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+export function CrisisPanel({ state, onClose }) {
+  const { t } = useTranslation();
+  const panel = useRef(null);
+  useEffect(() => {
+    panel.current?.focus();
+  }, []);
+  return (
+    <section
+      ref={panel}
+      tabIndex={-1}
+      className="crisis-panel"
+      role="alert"
+      aria-live="assertive"
+    >
+      <div className="crisis-head">
+        <AlertCircle />
+        <h2>{t('urgent_title')}</h2>
+        <button className="icon-button" onClick={onClose} aria-label={t('close')}>
+          <X />
+        </button>
+      </div>
+      <p>{t('urgent_guidance')}</p>
+      <p className="status-line">
+        {t(state.error ? 'task_failed' : state.saved ? 'task_created' : 'loading')}
+      </p>
+      <Badge kind="warning">{t('simulated')}</Badge>
+      <p className="small">{t('hotline_note')}</p>
+      <div className="hotlines">
+        {(state.hotlines || []).map((h) => (
+          <div key={h.name}>
+            <strong>{h.name}</strong>
+            <b dir="ltr">{h.number}</b>
+            <span>{t('needs_verification')}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+export function Button({
+  children,
+  onClick,
+  secondary = false,
+  disabled = false,
+  type = 'button',
+}) {
+  return (
+    <button
+      type={type}
+      disabled={disabled}
+      className={secondary ? 'button secondary' : 'button'}
+      onClick={onClick}
+    >
+      {children}
+      {!secondary && <ArrowUpRight size={17} />}
+    </button>
+  );
+}

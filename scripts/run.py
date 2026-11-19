@@ -12,7 +12,7 @@ if not python.exists():
     subprocess.run([sys.executable,'-m','venv',str(ROOT/'.venv')],check=True)
 check=subprocess.run([str(python),'-c','import fastapi,uvicorn,sqlalchemy,cryptography,yaml'],capture_output=True)
 if check.returncode:
-    subprocess.run([str(python),'-m','pip','install','-r','backend/requirements.txt'],check=True)
+    subprocess.run([str(python),'-m','pip','install','-r','backend/requirements-lock.txt'],check=True)
 if not (ROOT/'frontend/node_modules/vite').exists():
     subprocess.run(['npm','ci','--prefix','frontend','--ignore-scripts'],check=True)
 paths=sorted([*(ROOT/'frontend/src').rglob('*'),*(ROOT/'frontend/public').rglob('*'),*(ROOT/'frontend/scripts').rglob('*'),ROOT/'frontend/index.html',ROOT/'frontend/package-lock.json',ROOT/'frontend/vite.config.js'])
