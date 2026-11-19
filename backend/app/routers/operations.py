@@ -6,7 +6,7 @@ from ..auth import clinician, actor
 from ..db import get_db
 from ..models import Escalation,User,AdverseEvent,now
 from ..services.crypto import encrypt
-from ..services.consent import audit
+from ..services.consent import audit,require_consent
 from ..services.metrics import aggregate,elapsed
 from ..settings import config
 router=APIRouter(prefix='/api')
@@ -17,8 +17,8 @@ def queue(who=Depends(clinician),db=Depends(get_db)):
     rows=db.scalars(select(Escalation).join(User).where(User.cohort.is_(False)).order_by(Escalation.created_at.desc())).all()
     result=[]
     for e in rows:
+        require_consent(db,e.user_id,who,'care_handoff',[],'queue:'+e.id,operational=True)
         result.append({k:getattr(e,k) for k in ['id','status','created_at','claimed_at','contacted_at','resolved_at']}|{'mine':e.claimed_by==owner(who),'elapsed_minutes':round(elapsed(now(),e.created_at)/60,1)})
-        audit(db,e.user_id,who.id,'queue.operational_read',e.id)
     db.commit()
     return {'simulated':True,'target_minutes':config('pathways.yaml')['review_target_minutes'],'target_status':'UNVERIFIED','tasks':result}
 class Resolution(BaseModel):
@@ -69,7 +69,7 @@ def adverse_log(who=Depends(clinician),db=Depends(get_db)):
     rows=db.scalars(select(AdverseEvent).join(User).where(User.cohort.is_(False)).order_by(AdverseEvent.created_at.desc())).all()
     result=[]
     for row in rows:
+        require_consent(db,row.user_id,who,'care_handoff',[],'adverse_event:'+row.id,operational=True)
         result.append({'id':row.id,'category':row.category,'created_at':row.created_at})
-        audit(db,row.user_id,who.id,'adverse_event.operational_read',row.id)
     db.commit()
     return {'simulated':True,'items':result}

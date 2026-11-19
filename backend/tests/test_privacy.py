@@ -33,3 +33,9 @@ def test_access_history_identifies_role_and_grantee(client,db):
     with pytest.raises(HTTPException): require_consent(db,'alice',provider,'care_handoff',['scores'],'test')
     row=client.get('/api/audit',headers=headers()).json()[0]
     assert row['actor_role']=='provider' and row['grantee']=='primary'
+
+def test_operational_gate_never_grants_patient_content(db):
+    reviewer=db.get(Identity,'clinician')
+    assert require_consent(db,'alice',reviewer,'care_handoff',[],'queue:demo',operational=True) is False
+    with pytest.raises(HTTPException): require_consent(db,'alice',reviewer,'care_handoff',['scores'],'queue:demo',operational=True)
+    with pytest.raises(HTTPException): require_consent(db,'alice',db.get(Identity,'provider'),'care_handoff',[],'test')
