@@ -22,3 +22,10 @@ def test_keywords(text): assert triggers(text=text)
 def test_urgent_button(client):
     assert client.post('/api/crisis',headers=headers(),json={'urgent':True}).json()['escalation_id']
 def test_auth_required(client): assert client.post('/api/crisis',json={'urgent':True}).status_code==401
+@pytest.mark.parametrize('item9',[1,2,3])
+def test_immediate_item9_signal(client,item9):
+    r=client.post('/api/crisis',headers=headers(),json={'item9':item9})
+    assert r.status_code==200 and r.json()['escalation_id']
+@pytest.mark.parametrize('bad',[-1,4,True,1.2])
+def test_invalid_item9_signal(client,bad):
+    assert client.post('/api/crisis',headers=headers(),json={'item9':bad}).status_code==422

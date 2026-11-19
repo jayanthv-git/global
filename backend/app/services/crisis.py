@@ -25,4 +25,4 @@ def create_escalation(db, user_id, reasons):
 def guidance():
     return {'guidance_key':'urgent_guidance','staffing':'SIMULATED_CLINICIAN',
             'human_online':False,'hotlines':config('hotlines.yaml')['hotlines'],
-            'warning':'NEEDS_VERIFICATION','real_emergency_dispatch':False}
+            'keywords':RULES['crisis_keywords'],'warning':'NEEDS_VERIFICATION','real_emergency_dispatch':False}

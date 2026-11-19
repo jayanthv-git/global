@@ -16,7 +16,7 @@ def instruments(): return DEFINITIONS
 def crisis_guidance(): return guidance()
 @router.post('/crisis')
 def crisis(body:CrisisInput,who=Depends(participant),db=Depends(get_db)):
-    event=create_escalation(db,who.user_id,triggers(text=body.text,urgent=body.urgent))
+    event=create_escalation(db,who.user_id,triggers(instrument="PHQ-9" if body.item9 is not None else None,responses=[0]*8+[body.item9] if body.item9 is not None else None,text=body.text,urgent=body.urgent))
     if event: db.add(AuditLog(user_id=who.user_id,actor=who.id,action='crisis.created',resource=event.id))
     db.commit()
     return {'escalation_id':event.id if event else None,**guidance()}
