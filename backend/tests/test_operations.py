@@ -21,3 +21,14 @@ def test_queue_redacts_participant_content(client):
     assert len(tasks)==1
     assert not {'user_id','trigger','responses','resolution_encrypted'} & tasks[0].keys()
     assert client.get('/api/clinician/queue',headers=headers()).status_code==403
+
+def test_adverse_event_log_is_recorded_and_redacted(client):
+    id=client.post('/api/crisis',headers=headers(),json={'urgent':True}).json()['escalation_id']
+    h=headers('clinician')
+    client.post('/api/clinician/escalations/'+id+'/claim',headers=h)
+    r=client.post('/api/clinician/adverse-events',headers=h,json={'escalation_id':id,'category':'technical_failure','note':'Synthetic failure record'})
+    assert r.status_code==201
+    log=client.get('/api/clinician/adverse-events',headers=h).json()
+    assert log['simulated'] and log['items'][0]['category']=='technical_failure'
+    assert 'note' not in log['items'][0] and 'user_id' not in log['items'][0]
+    assert client.get('/api/clinician/adverse-events',headers=headers()).status_code==403

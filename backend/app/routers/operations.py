@@ -63,3 +63,13 @@ def adverse(body:AdverseInput,who=Depends(clinician),db=Depends(get_db)):
 def metrics(dimension:Literal['all','age_band','gender','nationality','language','geography']='all',who=Depends(actor),db=Depends(get_db)):
     if who.role!='clinician': raise HTTPException(403,'Simulated clinician session required')
     return aggregate(db,dimension)
+
+@router.get('/clinician/adverse-events')
+def adverse_log(who=Depends(clinician),db=Depends(get_db)):
+    rows=db.scalars(select(AdverseEvent).join(User).where(User.cohort.is_(False)).order_by(AdverseEvent.created_at.desc())).all()
+    result=[]
+    for row in rows:
+        result.append({'id':row.id,'category':row.category,'created_at':row.created_at})
+        audit(db,row.user_id,who.id,'adverse_event.operational_read',row.id)
+    db.commit()
+    return {'simulated':True,'items':result}
