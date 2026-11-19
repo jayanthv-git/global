@@ -27,3 +27,9 @@ def test_consent_owner_isolation(client):
     c=client.post('/api/consents',headers=headers(),json={'grantee':'primary','scope':['scores']}).json()
     assert client.delete('/api/consents/'+c['id'],headers=headers('bob')).status_code==404
     assert client.get('/api/consents',headers=headers('bob')).json()==[]
+
+def test_access_history_identifies_role_and_grantee(client,db):
+    provider=db.get(Identity,'provider')
+    with pytest.raises(HTTPException): require_consent(db,'alice',provider,'care_handoff',['scores'],'test')
+    row=client.get('/api/audit',headers=headers()).json()[0]
+    assert row['actor_role']=='provider' and row['grantee']=='primary'

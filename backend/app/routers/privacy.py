@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import select
 from ..auth import participant
 from ..db import get_db
-from ..models import Consent, Provider, AuditLog, now
+from ..models import Consent, Provider, AuditLog, Identity, now
 from ..services.consent import audit
 router=APIRouter(prefix='/api')
 class ConsentInput(BaseModel):
@@ -35,4 +35,10 @@ def revoke(id:str,who=Depends(participant),db=Depends(get_db)):
     return serialize(c)
 @router.get('/audit')
 def audit_history(who=Depends(participant),db=Depends(get_db)):
-    return [{k:getattr(x,k) for k in ('id','actor','action','resource','created_at')} for x in db.scalars(select(AuditLog).where(AuditLog.user_id==who.user_id).order_by(AuditLog.created_at.desc()))]
+    rows=[]
+    for x in db.scalars(select(AuditLog).where(AuditLog.user_id==who.user_id).order_by(AuditLog.created_at.desc())):
+        identity=db.get(Identity,x.actor)
+        row={k:getattr(x,k) for k in ('id','actor','action','resource','created_at')}
+        row.update(actor_role=identity.role if identity else 'system',grantee=identity.grantee if identity else None)
+        rows.append(row)
+    return rows
