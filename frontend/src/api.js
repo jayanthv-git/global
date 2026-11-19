@@ -10,3 +10,8 @@ export async function providerRead(id,provider,scopes){
  const session=await post('/demo/session',{persona:'provider',provider_id:provider});
  return api(`/providers/referrals/${id}/summary?scopes=${encodeURIComponent(scopes.join(','))}`,{headers:{Authorization:`Bearer ${session.token}`}});
 }
+let clinicianToken='';
+export async function operations(path,options={}){
+ if(!clinicianToken)clinicianToken=(await post('/demo/session',{persona:'clinician'})).token;
+ return api(path,{...options,headers:{Authorization:`Bearer ${clinicianToken}`,...options.headers}});
+}
