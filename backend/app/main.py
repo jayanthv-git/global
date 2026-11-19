@@ -5,11 +5,12 @@ from .services.pathways import seed_providers
 from .routers import checkin, privacy, referrals, demo, operations, progress
 @asynccontextmanager
 async def lifespan(app):
-    init_db()
-    with Session() as db:
-        seed_providers(db)
-        from data.generate import seed_cohort
-        seed_cohort(db)
+    if not app.dependency_overrides:
+        init_db()
+        with Session() as db:
+            seed_providers(db)
+            from data.generate import seed_cohort
+            seed_cohort(db)
     yield
 app=FastAPI(title='Saha • local wellbeing demo',lifespan=lifespan)
 app.include_router(checkin.router)

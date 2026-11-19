@@ -32,3 +32,13 @@ def test_adverse_event_log_is_recorded_and_redacted(client):
     assert log['simulated'] and log['items'][0]['category']=='technical_failure'
     assert 'note' not in log['items'][0] and 'user_id' not in log['items'][0]
     assert client.get('/api/clinician/adverse-events',headers=headers()).status_code==403
+
+def test_second_reviewer_cannot_take_or_resolve_claimed_task(client,db):
+    from backend.app.models import Identity
+    from backend.app.auth import token_hash
+    db.add(Identity(id='reviewer-two',role='clinician',token_hash=token_hash('reviewer-two')));db.commit()
+    id=client.post('/api/crisis',headers=headers(),json={'urgent':True}).json()['escalation_id']
+    path='/api/clinician/escalations/'+id
+    assert client.post(path+'/claim',headers=headers('clinician')).status_code==200
+    assert client.post(path+'/claim',headers=headers('reviewer-two')).status_code==409
+    assert client.post(path+'/contact',headers=headers('reviewer-two')).status_code==409

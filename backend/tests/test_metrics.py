@@ -31,3 +31,25 @@ def test_seeded_metrics_all_dimensions(db):
 def test_metrics_protected(client):
     assert client.get('/api/metrics/aggregate',headers=headers()).status_code==403
     assert client.get('/api/metrics/aggregate',headers=headers('clinician')).status_code==200
+
+def test_aggregate_endpoint_reveals_no_small_group(client,db):
+    for i in range(9): db.add(User(id=f'api-small-{i}',cohort=True,synthetic=True,nationality='small'))
+    db.commit()
+    response=client.get('/api/metrics/aggregate?dimension=nationality',headers=headers('clinician'))
+    assert response.status_code==200
+    assert response.json()['groups']==[]
+    assert 'participants' not in response.text
+
+def test_sparse_metric_contributors_suppressed(db):
+    from datetime import timedelta
+    from backend.app.models import Referral,Followup,now
+    from backend.app.services.crypto import encrypt
+    for i in range(10):
+        id=f'sparse-{i}'
+        db.add(User(id=id,cohort=True,synthetic=True));db.flush()
+        r=Referral(user_id=id,provider_id='primary',context_encrypted=encrypt(''),created_at=now())
+        db.add(r);db.flush()
+        if i<9: db.add(Followup(user_id=id,referral_id=r.id,seen=False,note_encrypted=encrypt(''),created_at=now()+timedelta(days=1)))
+    db.commit()
+    assert aggregate(db)['groups'][0]['participants']==10
+    assert aggregate(db)['groups'][0]['followup_hours'] is None

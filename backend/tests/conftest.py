@@ -9,7 +9,9 @@ from backend.app.auth import token_hash
 from backend.app.main import app
 from backend.app.services.pathways import seed_providers
 @pytest.fixture
-def db():
+def db(monkeypatch):
+    from cryptography.fernet import Fernet
+    monkeypatch.setenv("FIELD_ENCRYPTION_KEY",Fernet.generate_key().decode())
     engine=create_engine('sqlite://',connect_args={'check_same_thread':False},poolclass=StaticPool)
     @event.listens_for(engine,'connect')
     def fk(conn,_): conn.execute('PRAGMA foreign_keys=ON')
