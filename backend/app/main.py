@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from .db import init_db, Session
 from .services.pathways import seed_providers
-from .routers import checkin, privacy
+from .routers import checkin, privacy, referrals
 @asynccontextmanager
 async def lifespan(app):
     init_db()
@@ -11,5 +11,6 @@ async def lifespan(app):
 app=FastAPI(title='Saha • local wellbeing demo',lifespan=lifespan)
 app.include_router(checkin.router)
 app.include_router(privacy.router)
+app.include_router(referrals.router)
 @app.get('/api/health')
 def health(): return {'status':'ok','mode':'LOCAL_SYNTHETIC_DEMO'}
