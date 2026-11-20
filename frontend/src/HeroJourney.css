@@ -1,0 +1,261 @@
+/* Scoped to the illustrative landing section; existing app styling is untouched. */
+.hero-journey {
+  --hero-ink: #f7faf4;
+  --hero-panel: rgb(20 37 34 / 94%);
+  margin-block-end: 3.5rem;
+  color: var(--hero-ink);
+}
+.hero-skip {
+  display: inline-block;
+  color: #314b3e;
+  margin-block-end: 1rem;
+  font-size: 1rem;
+  text-underline-offset: 0.25em;
+}
+.hero-journey__track {
+  height: 400vh;
+  height: 400svh;
+  position: relative;
+}
+.hero-journey__stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  isolation: isolate;
+  overflow: hidden;
+  background: #182a2b;
+  border-radius: 0.75rem;
+}
+.hero-journey__media {
+  position: absolute;
+  inset: 0;
+}
+.hero-journey__poster,
+.hero-journey__media video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* Keep the complete frame, including its original marks. */
+}
+.hero-journey__media video {
+  opacity: 0;
+}
+.hero-journey__media video.is-ready {
+  opacity: 1;
+}
+.hero-journey__chapters {
+  position: absolute;
+  inset-inline-start: 1.25rem;
+  inset-block-end: 2.75rem;
+  width: min(29%, 22rem);
+  display: grid;
+  z-index: 1;
+}
+.hero-journey__chapter {
+  grid-area: 1 / 1;
+  padding: 1.25rem;
+  border: 1px solid rgb(235 242 221 / 20%);
+  border-radius: 0.65rem;
+  background: var(--hero-panel);
+  opacity: var(--chapter-opacity, 1);
+  pointer-events: none;
+  align-self: start;
+}
+.hero-journey__chapter h2 {
+  font:
+    500 clamp(1.25rem, 2.1vw, 1.85rem) / 1.22 Georgia,
+    'Times New Roman',
+    serif;
+  letter-spacing: -0.025em;
+  color: var(--hero-ink);
+  margin: 0 0 0.85rem;
+}
+.hero-journey__chapter p {
+  font-size: 1rem;
+  line-height: 1.65;
+  margin: 0;
+  color: var(--hero-ink);
+}
+.hero-journey__scroll-hint {
+  position: absolute;
+  inset-block-start: 1.2rem;
+  inset-inline-start: 1.25rem;
+  padding: 0.5rem 0.8rem;
+  background: var(--hero-panel);
+  border-radius: 0.35rem;
+  margin: 0;
+  font-size: 0.875rem;
+}
+.hero-journey__loading {
+  position: absolute;
+  inset-inline-end: 1.25rem;
+  inset-block-start: 1.5rem;
+  width: 0.75rem;
+  height: 0.75rem;
+  border: 2px solid #f7faf4;
+  border-radius: 50%;
+  background: #314b3e;
+  box-shadow: 0 0 0 5px rgb(20 37 34 / 90%);
+  animation: hero-loading 1.5s ease-in-out infinite;
+}
+@keyframes hero-loading {
+  50% {
+    opacity: 0.4;
+  }
+}
+.hero-journey__after {
+  padding: 1.75rem 0 0;
+  color: #314b3e;
+}
+.hero-journey__cta {
+  display: inline-flex;
+  align-items: center;
+  min-height: 3rem;
+  padding: 0.85rem 1.3rem;
+  background: #314b3e;
+  color: #fff;
+  border-radius: 0.4rem;
+  font-size: 1rem;
+  text-decoration: none;
+}
+.hero-journey__caption {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  margin: 1rem 0 0.5rem;
+  color: #425449;
+}
+.hero-journey__disclaimer {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  max-width: 48rem;
+  margin: 0;
+  color: #425449;
+}
+#check-in {
+  scroll-margin-block-start: 1.5rem;
+}
+[dir='rtl'] .hero-journey__chapter h2 {
+  font-family: Tahoma, Arial, sans-serif;
+  letter-spacing: 0;
+}
+/* Narrow screens use the letterbox below the uncropped film for the text panel. */
+@media (max-width: 1000px), (max-height: 650px) {
+  .hero-journey__media {
+    inset: 8rem 0 auto;
+    height: calc(58% - 8rem);
+  }
+  .hero-journey__chapters {
+    width: auto;
+    inset-inline: 1rem;
+    inset-block-end: 1.5rem;
+  }
+  .hero-journey__chapter {
+    min-height: 12rem;
+  }
+  .hero-journey__chapter h2 {
+    font-size: 1.5rem;
+  }
+  .hero-journey__scroll-hint {
+    inset-block-start: 0.75rem;
+    font-size: 0.875rem;
+  }
+}
+/* Extremely short/zoomed views cannot fit readable overlay text safely. */
+@media (max-height: 480px) {
+  .hero-journey--scroll .hero-journey__stage {
+    min-height: 30rem;
+  }
+}
+.hero-journey--static .hero-journey__track {
+  height: auto;
+}
+.hero-journey--static .hero-journey__stage {
+  position: relative;
+  height: auto;
+  min-height: 0;
+  overflow: visible;
+}
+.hero-journey--static .hero-journey__media {
+  position: relative;
+  inset: auto;
+  height: auto;
+  aspect-ratio: 16 / 9;
+}
+.hero-journey--static .hero-journey__chapters {
+  position: relative;
+  inset: auto;
+  width: auto;
+  display: grid;
+  padding: 1rem;
+  gap: 1rem;
+}
+.hero-journey--static .hero-journey__chapter {
+  grid-area: auto;
+  opacity: 1;
+  pointer-events: auto;
+  min-height: 0;
+  background: #20352f;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-journey__track {
+    height: auto;
+  }
+  .hero-journey__stage {
+    position: relative;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+  .hero-journey__media {
+    position: relative;
+    inset: auto;
+    height: auto;
+    aspect-ratio: 16 / 9;
+  }
+  .hero-journey__media video,
+  .hero-journey__loading,
+  .hero-journey__scroll-hint {
+    display: none;
+  }
+  .hero-journey__chapters {
+    position: relative;
+    inset: auto;
+    width: auto;
+    display: grid;
+    padding: 1rem;
+    gap: 1rem;
+  }
+  .hero-journey__chapter {
+    grid-area: auto;
+    opacity: 1;
+    min-height: 0;
+    pointer-events: auto;
+  }
+}
+.hero-journey__prototype-note {
+  position: absolute;
+  inset-inline-start: 1.25rem;
+  inset-block-start: 4rem;
+  max-width: min(65%, 22rem);
+  padding: 0.55rem 0.8rem;
+  background: var(--hero-panel);
+  border-radius: 0.35rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--hero-ink);
+  margin: 0;
+}
+.hero-journey--static .hero-journey__prototype-note {
+  position: static;
+  max-width: none;
+  margin: 0 1rem 1rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-journey__prototype-note {
+    position: static;
+    max-width: none;
+    margin: 0 1rem 1rem;
+  }
+}

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Leaf, ShieldCheck, HeartHandshake, ArrowRight } from 'lucide-react';
 import { Badge, Button, Header, Select, Empty } from './components';
 import { post } from './api';
+import HeroJourney from './HeroJourney';
 export function Checkin({ onResult, urgent }) {
   const { t } = useTranslation();
   const [started, setStarted] = useState(false);
@@ -46,7 +47,8 @@ export function Checkin({ onResult, urgent }) {
       urgent({ item9: Number(value) });
   }
   return (
-    <>
+    <div id="check-in" tabIndex={-1}>
+      {!started && <HeroJourney onStart={() => setStarted(true)} />}
       <Header eyebrow={t('step1')} title={t('welcome')} subtitle={t('intro')} />
       {!started ? (
         <>
@@ -171,7 +173,7 @@ export function Checkin({ onResult, urgent }) {
           </div>
         </form>
       )}
-    </>
+    </div>
   );
 }
 export function Result({ result, setPage }) {

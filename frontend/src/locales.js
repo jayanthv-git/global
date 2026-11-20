@@ -1,4 +1,24 @@
 const en = {
+  hero_demo_short: 'Prototype: placeholder questions; simulated clinicians.',
+  hero_label: 'A journey to support',
+  hero_skip: 'Skip to check-in',
+  hero_start: 'Start your check-in',
+  hero_scroll: 'Scroll to explore',
+  hero_caption: 'Illustrative AI-generated animation. It is not the app interface.',
+  hero_demo_note:
+    'This prototype uses placeholder questions and simulated clinicians. It is not validated screening or a care service.',
+  hero_notice_title: 'Notice change early',
+  hero_notice_body:
+    'Small shifts in how you feel are easy to miss. A short, validated check-in helps you see them over time.',
+  hero_support_title: 'Find the right kind of support',
+  hero_support_body:
+    'From self-help to your doctor to specialist care, see options that fit you, with clear eligibility.',
+  hero_consent_title: 'You choose what is shared',
+  hero_consent_body:
+    'Information goes to a provider only if you agree. Consent is specific, and you can withdraw it any time.',
+  hero_people_title: 'People stay in charge',
+  hero_people_body:
+    'This tool does not diagnose or replace care. Licensed professionals make the decisions.',
   audit_action_read_operational_only: 'Operational markers viewed (no patient content)',
   audit_action_assessment_created: 'Check-in saved',
   audit_action_assessment_trend_read: 'Your trend viewed',
@@ -290,6 +310,27 @@ const en = {
   'Al Dhafra': 'Al Dhafra',
 };
 const ar = {
+  hero_demo_short: 'نموذج تجريبي: أسئلة تجريبية ومختصون محاكاة.',
+  // Hero translations need native-speaker review before public use.
+  hero_label: 'رحلة نحو الدعم',
+  hero_skip: 'انتقل إلى الاطمئنان',
+  hero_start: 'ابدأ الاطمئنان على نفسك',
+  hero_scroll: 'مرّر لاستكشاف الرحلة',
+  hero_caption: 'رسوم متحركة توضيحية مولّدة بالذكاء الاصطناعي. ليست واجهة التطبيق.',
+  hero_demo_note:
+    'يستخدم هذا النموذج أسئلة تجريبية ومختصين محاكين. ليس فحصاً معتمداً ولا خدمة رعاية.',
+  hero_notice_title: 'لاحظ التغيّر مبكراً',
+  hero_notice_body:
+    'قد تمرّ التغيّرات الصغيرة في شعورك دون أن تلاحظها. يساعدك تقييم قصير ومعتمد على ملاحظتها مع مرور الوقت.',
+  hero_support_title: 'اعثر على الدعم المناسب',
+  hero_support_body:
+    'من المساعدة الذاتية إلى طبيبك والرعاية المتخصصة، استكشف خيارات تناسبك مع توضيح شروط الاستفادة منها.',
+  hero_consent_title: 'أنت تختار ما تتم مشاركته',
+  hero_consent_body:
+    'لا تُشارك المعلومات مع مقدم الخدمة إلا بموافقتك. تحدد موافقتك ما يُشارك، ويمكنك سحبها في أي وقت.',
+  hero_people_title: 'يبقى القرار بيد البشر',
+  hero_people_body:
+    'هذه الأداة لا تشخّص الحالات ولا تحلّ محل الرعاية. يتولى المختصون المرخّصون اتخاذ القرارات.',
   audit_action_read_operational_only: 'تم عرض مؤشرات تشغيلية دون بيانات المشارك',
   audit_action_assessment_created: 'تم حفظ الاطمئنان',
   audit_action_assessment_trend_read: 'تم عرض تقدمك',
