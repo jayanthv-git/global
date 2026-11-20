@@ -10,3 +10,5 @@ node_modules/
 frontend/dist/
 .DS_Store
 coverage.xml
+# Original 4K media is local authoring input, never shipped or committed.
+assets-source/
